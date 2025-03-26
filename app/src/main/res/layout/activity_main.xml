@@ -5,10 +5,11 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="35dp"
     android:background="@color/yellow"
     tools:context=".Activity.MainActivity">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,15 +26,6 @@
                 android:layout_marginTop="48dp"
                 android:layout_marginEnd="16dp">
 
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/profile" />
-
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
@@ -41,7 +33,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="Welcome"
-                    app:layout_constraintStart_toEndOf="@+id/imageView5"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -50,7 +42,6 @@
                     android:layout_height="wrap_content"
                     android:text="Alex Johnson"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView5"
                     app:layout_constraintStart_toStartOf="@+id/textView"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -90,60 +81,58 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <EditText
-                android:id="@+id/editTextText"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/white_bg"
-                android:drawableStart="@drawable/search_icon"
-                android:drawablePadding="8dp"
-                android:ems="10"
-                android:hint="What do you want eat today?"
-                android:inputType="text"
-                android:padding="8dp"
-                android:textColor="@color/dark_blue"
-                android:textColorHint="@color/dark_blue"
-                android:textSize="14sp" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp">
 
+                <!-- RecyclerView hiển thị danh sách món ăn được đề xuất -->
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/categoryView"
+                    android:id="@+id/listMealsView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="8dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listRestaurantView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="90dp"
                     android:clipToPadding="false"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/listMealsView" />
 
                 <ProgressBar
                     android:id="@+id/progressBarCategory"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/categoryView"
+                    app:layout_constraintBottom_toBottomOf="@id/listRestaurantView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/categoryView" />
+                    app:layout_constraintTop_toTopOf="@id/listRestaurantView" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:itemIconTint="@color/white"
+        app:itemIconTint="@color/dark_yellow"
         app:itemTextColor="@color/dark_blue"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

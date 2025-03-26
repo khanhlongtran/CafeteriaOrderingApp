@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Cafeteria Ordering</string>
+    <string-array name="order_status">
+        <item>DELIVERY_ACCEPTED</item>
+        <item>DELIVERY_IN_PROGRESS</item>
+        <item>COMPLETED</item>
+        <item>CANCELED</item>
+    </string-array>
+
 </resources>

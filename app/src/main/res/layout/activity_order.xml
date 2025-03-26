@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow"
+    android:orientation="vertical"
+    tools:context=".Activity.OrderActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Current Order"
+        android:textColor="@color/dark_blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/white_bg">
+
+        <ImageView
+            android:id="@+id/orderImg"
+            android:layout_width="150dp"
+            android:layout_height="110dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/orderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Order Title"
+            android:textColor="@color/dark_blue"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/orderPrice"
+            app:layout_constraintStart_toEndOf="@+id/orderImg"
+            app:layout_constraintTop_toTopOf="@+id/orderImg"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/orderPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$0"
+            android:textColor="@color/red"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/orderStatus"
+            app:layout_constraintStart_toStartOf="@+id/orderTitle"
+            app:layout_constraintTop_toBottomOf="@+id/orderTitle" />
+
+        <TextView
+            android:id="@+id/orderStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status: Pending"
+            android:textColor="@color/dark_blue"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/orderTime"
+            app:layout_constraintStart_toStartOf="@+id/orderPrice"
+            app:layout_constraintTop_toBottomOf="@+id/orderPrice" />
+
+        <TextView
+            android:id="@+id/orderTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time: 10:00 AM"
+            android:textColor="@color/dark_blue"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/orderRating"
+            app:layout_constraintStart_toStartOf="@+id/orderStatus"
+            app:layout_constraintTop_toBottomOf="@+id/orderStatus" />
+
+        <RatingBar
+            android:id="@+id/orderRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:stepSize="1"
+            app:layout_constraintBottom_toTopOf="@+id/orderFeedback"
+            app:layout_constraintStart_toStartOf="@+id/orderTime"
+            app:layout_constraintTop_toBottomOf="@+id/orderTime" />
+
+        <EditText
+            android:id="@+id/orderFeedback"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/white_bg"
+            android:hint="Feedback..."
+            android:inputType="textMultiLine"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/orderImg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/orderRating"
+            app:layout_constraintTop_toBottomOf="@+id/orderRating" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/orderSendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/red_bg"
+            android:text="Send"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/orderFeedback"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/orderFeedback" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Order History"
+        android:textColor="@color/dark_blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/orderHistoryRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp" />
+
+</LinearLayout>
