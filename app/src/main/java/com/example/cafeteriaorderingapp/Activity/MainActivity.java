@@ -1,6 +1,8 @@
 package com.example.cafeteriaorderingapp.Activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
@@ -15,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 
 import com.example.cafeteriaorderingapp.Adapter.CategoryAdapter;
+import com.example.cafeteriaorderingapp.Adapter.MealAdapter;
 import com.example.cafeteriaorderingapp.Adapter.SliderAdapter;
 import com.example.cafeteriaorderingapp.Domain.Category;
 import com.example.cafeteriaorderingapp.Domain.SliderItems;
@@ -26,10 +30,12 @@ import com.example.cafeteriaorderingapp.R;
 import com.example.cafeteriaorderingapp.Service.ApiService;
 import com.example.cafeteriaorderingapp.Service.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.example.cafeteriaorderingapp.Adapter.MenuAdapter;
+//import com.google.firebase.database.DataSnapshot;
+//import com.google.firebase.database.DatabaseError;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,29 +46,40 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
-    private ProgressBar progressBarBanner, progressBarCategory;
-    private ViewPager2 viewpager2;
     private RecyclerView restaurantsView, mealsView;
     private BottomNavigationView bottomMenu;
     private static final String TAG = "API_RESPONSE";
     ApiService recommendService = RetrofitClient.getRecommendService();
     ApiService detailService = RetrofitClient.getDetailService();
     private List<MealDetail> mealDetails = new ArrayList<>(); // List chứa MealDetail
-    private List<RestaurantDetail> restaurantDetailList = new ArrayList<>();
+    private MealAdapter mealAdapter;
+    private List<RestaurantDetail.Menu> menuList = new ArrayList<>();
+    private MenuAdapter menuAdapter;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+        String userIdStr  = sharedPreferences.getString("ACCOUNT_ID", null);
+        userId = (userIdStr != null) ? Integer.parseInt(userIdStr) : -1;
+
         initViews();
         initMeals();
         initRestaurants();
-        initBanner();
+        mealAdapter = new MealAdapter(mealDetails);
+        mealsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        mealsView.setAdapter(mealAdapter);
+
+        Log.d("MealList", "Size: " + mealDetails.size());
+
+
         setVariable();
     }
 
     private void initRestaurants() {
-        recommendService.getRecommendedRestaurants(35).enqueue(new Callback<List<RestaurantRecommendation>>() {
+        recommendService.getRecommendedRestaurants(userId).enqueue(new Callback<List<RestaurantRecommendation>>() {
             @Override
             public void onResponse(Call<List<RestaurantRecommendation>> call, Response<List<RestaurantRecommendation>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -87,34 +104,51 @@ public class MainActivity extends BaseActivity {
 
     private void fetchRestaurantDetail(int addressId) {
         String url = detailService.getRestaurantDetail(addressId).request().url().toString(); // Lấy URL
-
+        Log.d(TAG, "fetchRestaurantDetail: " + url);
         detailService.getRestaurantDetail(addressId).enqueue(new Callback<RestaurantDetail>() {
             @Override
             public void onResponse(Call<RestaurantDetail> call, Response<RestaurantDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     RestaurantDetail restaurantDetail = response.body();
-                    restaurantDetailList.add(restaurantDetail); // Thêm vào danh sách
 
-                    Log.d(TAG, "Restaurant Name: " + restaurantDetail.getFullName());
-                    Log.d(TAG, "Address: " + restaurantDetail.getAddressLine());
-                    Log.d(TAG, "Phone: " + restaurantDetail.getPhone());
+                    Log.d(TAG, "Restaurant Name: " + restaurantDetail.getMenuName());
+                    Log.d(TAG, "Menu Id: " + restaurantDetail.getMenuId());
 
-                    // Log danh sách menu
-                    for (RestaurantDetail.Menu menu : restaurantDetail.getMenus()) {
-                        Log.d(TAG, "Menu: " + menu.getMenuName());
-                        for (RestaurantDetail.MenuItem item : menu.getMenuItems()) {
-                            Log.d(TAG, " - " + item.getItemName() + " | Price: " + item.getPrice());
+                    // Kiểm tra JSON trả về
+                    Log.d(TAG, "Raw JSON Response: " + new Gson().toJson(response.body()));
+
+                    // Lấy danh sách địa chỉ
+                    String restaurantImage = null;
+                    if (restaurantDetail.getAddresses() != null && !restaurantDetail.getAddresses().isEmpty()) {
+                        restaurantImage = restaurantDetail.getAddresses().get(0).getImage(); // Lấy ảnh từ address đầu tiên
+                    } else {
+                        Log.e(TAG, "Addresses is NULL hoặc trống!");
+                    }
+
+                    // Tạo một đối tượng đại diện cho nhà hàng
+                    RestaurantDetail.Menu restaurantMenu = new RestaurantDetail.Menu();
+                    restaurantMenu.setItemName(restaurantDetail.getMenuName()); // Đặt menuName làm tên nhà hàng
+                    restaurantMenu.setImage(restaurantImage); // Đặt ảnh từ address làm ảnh
+                    Log.d(TAG, "onResponse: restaurantDetail.getMenus()" + restaurantDetail.getMenus());
+                    // Mỗi nhà hàng cần có danh sách món ăn riêng
+                    List<RestaurantDetail.Menu> menuItems = new ArrayList<>(restaurantDetail.getMenus());
+                    Log.d(TAG, "onResponse: menuItems " + menuItems.toString());
+                    // Lưu thông tin nhà hàng + danh sách món ăn
+                    restaurantMenu.setMenuList(menuItems);  // Cần thêm getter/setter cho menuList
+
+                    menuList.add(restaurantMenu); // Thêm nhà hàng vào danh sách menu
+
+                    runOnUiThread(() -> {
+                        if (menuAdapter == null) {
+                            menuAdapter = new MenuAdapter(MainActivity.this, menuList);
+                            restaurantsView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                            restaurantsView.setAdapter(menuAdapter);
+                        } else {
+                            menuAdapter.notifyDataSetChanged();
                         }
-                    }
-
-                } else {
-                    Log.e(TAG, "Failed to fetch restaurant detail | HTTP Code: " + response.code() + " | URL: " + url);
-                    try {
-                        Log.e(TAG, "Error Body: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        Log.e(TAG, "Failed to read error body", e);
-                    }
+                    });
                 }
+
             }
 
             @Override
@@ -126,7 +160,7 @@ public class MainActivity extends BaseActivity {
 
 
     private void initMeals() {
-        Call<List<MealRecommendation>> call = recommendService.getRecommendedMeals(35); // Hardcoded user_id
+        Call<List<MealRecommendation>> call = recommendService.getRecommendedMeals(userId); // Hardcoded user_id
         call.enqueue(new Callback<List<MealRecommendation>>() {
             @Override
             public void onResponse(Call<List<MealRecommendation>> call, Response<List<MealRecommendation>> response) {
@@ -163,6 +197,7 @@ public class MainActivity extends BaseActivity {
                     MealDetail mealDetail = response.body();
                     mealDetails.add(mealDetail); // Thêm vào danh sách
                     Log.d(TAG, "✅ Success - Detail: " + mealDetail.getItemName() + " - " + mealDetail.getDescription());
+                    runOnUiThread(() -> mealAdapter.notifyDataSetChanged());
                 } else {
                     // Log lỗi từ server (nếu có)
                     try {
@@ -185,48 +220,11 @@ public class MainActivity extends BaseActivity {
 
 
     private void initViews() {
-        progressBarBanner = findViewById(R.id.progressBarBanner);
-        progressBarCategory = findViewById(R.id.progressBarCategory);
-        viewpager2 = findViewById(R.id.viewpager2);
         restaurantsView = findViewById(R.id.listRestaurantView);
         mealsView = findViewById(R.id.listMealsView);
         bottomMenu = findViewById(R.id.bottomMenu);
     }
 
-    private void initBanner() {
-        DatabaseReference myRef = database.getReference("Banners");
-        progressBarBanner.setVisibility(View.VISIBLE);
-        ArrayList<SliderItems> items = new ArrayList<>();
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot issue : snapshot.getChildren()) {
-                        items.add(issue.getValue(SliderItems.class));
-                    }
-                    banners(items);
-                    progressBarBanner.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
-
-    private void banners(ArrayList<SliderItems> items) {
-        viewpager2.setAdapter(new SliderAdapter(items, viewpager2));
-        viewpager2.setClipChildren(false);
-        viewpager2.setClipToPadding(false);
-        viewpager2.setOffscreenPageLimit(3);
-        viewpager2.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
-
-        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-        compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-
-        viewpager2.setPageTransformer(compositePageTransformer);
-    }
 
     private void setVariable() {
         bottomMenu.setSelectedItemId(R.id.home);
@@ -248,30 +246,5 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    // De xuat quan an, mon an => list mon an khi an vao
-    private void initCategory() {
-        DatabaseReference myRef = database.getReference("Category");
-        progressBarCategory.setVisibility(View.VISIBLE);
-        ArrayList<Category> list = new ArrayList<>();
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot issue : snapshot.getChildren()) {
-                        list.add(issue.getValue(Category.class));
-                    }
-                    if (!list.isEmpty()) {
-                        restaurantsView.setLayoutManager(new GridLayoutManager(MainActivity.this, 3));
-                        restaurantsView.setAdapter(new CategoryAdapter(list));
-                    }
-                    progressBarCategory.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
     }
-}
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="order_status_options">
+        <item>@string/DELIVERY_ACCEPTED</item>
+        <item>@string/DELIVERY_IN_PROGRESS</item>
+        <item>@string/COMPLETED</item>
+        <item>@string/CANCELED</item>
+    </array>
+</resources>

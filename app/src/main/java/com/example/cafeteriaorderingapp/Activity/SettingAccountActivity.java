@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
@@ -38,7 +39,7 @@ import com.google.android.gms.tasks.Task;
 
 
 public class SettingAccountActivity extends BaseActivity {
-    private AppCompatButton LocationButton;
+    private AppCompatButton LocationButton, updateButton, logoutButton;
     private LocationRequest locationRequest;
 
     @Override
@@ -47,11 +48,26 @@ public class SettingAccountActivity extends BaseActivity {
         setContentView(R.layout.activity_setting_account);
 
         LocationButton = findViewById(R.id.LocationButton);
-
+        updateButton = findViewById(R.id.updateButton);
+        logoutButton = findViewById(R.id.logoutButton);
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+
+                Intent intent = new Intent(SettingAccountActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         LocationButton.setOnClickListener(new View.OnClickListener() {
             @Override

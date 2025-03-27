@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 
 import com.example.cafeteriaorderingapp.Domain.Foods;
+import com.example.cafeteriaorderingapp.Dto.RestaurantDetail;
 
 import java.util.ArrayList;
 
@@ -18,58 +19,72 @@ public class ManagmentCart {
         this.tinyDB = new TinyDB(context);
     }
 
-    public void insertFood(Foods item) {
-        ArrayList<Foods> listpop = getListCart();
+
+    public void insertFood(RestaurantDetail.Menu foodItem) {
+        ArrayList<RestaurantDetail.Menu> cartList = getListCart();
         boolean existAlready = false;
-        int n = 0;
-        for (int i = 0; i < listpop.size(); i++) {
-            if (listpop.get(i).getTitle().equals(item.getTitle())) {
+        int index = -1;
+
+        for (int i = 0; i < cartList.size(); i++) {
+            if (cartList.get(i).getItemName().equals(foodItem.getItemName())) {
                 existAlready = true;
-                n = i;
+                index = i;
                 break;
             }
         }
+
         if (existAlready) {
-            listpop.get(n).setNumberInCart(item.getNumberInCart());
+            cartList.get(index).setNumberInCart(foodItem.getNumberInCart());
         } else {
-            listpop.add(item);
+            cartList.add(foodItem);
         }
-        tinyDB.putListObject("CartList", listpop);
+
+        tinyDB.putListObject("CartList", cartList);
         Toast.makeText(context, "Added to your Cart", Toast.LENGTH_SHORT).show();
     }
 
-    public ArrayList<Foods> getListCart() {
+
+    public ArrayList<RestaurantDetail.Menu> getListCart() {
         return tinyDB.getListObject("CartList");
     }
 
-    public Double getTotalFee() {
-        ArrayList<Foods> listItem = getListCart();
-        double fee = 0;
-        for (int i = 0; i < listItem.size(); i++) {
-            fee = fee + (listItem.get(i).getPrice() * listItem.get(i).getNumberInCart());
+    public double getTotalFee() {
+        ArrayList<RestaurantDetail.Menu> cartList = getListCart();
+        double totalFee = 0;
+
+        for (RestaurantDetail.Menu foodItem : cartList) {
+            totalFee += foodItem.getPrice() * foodItem.getNumberInCart();
         }
-        return fee;
+
+        return totalFee;
     }
 
-    public void minusNumberItem(ArrayList<Foods> listItem, int position, ChangeNumberItemsListener changeNumberItemsListener) {
-        if (listItem.get(position).getNumberInCart() == 1) {
-            listItem.remove(position);
+    public void minusNumberItem(ArrayList<RestaurantDetail.Menu> cartList, int position, ChangeNumberItemsListener changeNumberItemsListener) {
+        if (cartList.get(position).getNumberInCart() == 1) {
+            cartList.remove(position);
         } else {
-            listItem.get(position).setNumberInCart(listItem.get(position).getNumberInCart() - 1);
+            cartList.get(position).setNumberInCart(cartList.get(position).getNumberInCart() - 1);
         }
-        tinyDB.putListObject("CartList", listItem);
+
+        tinyDB.putListObject("CartList", cartList);
         changeNumberItemsListener.change();
     }
 
-    public void plusNumberItem(ArrayList<Foods> listItem, int position, ChangeNumberItemsListener changeNumberItemsListener) {
-        listItem.get(position).setNumberInCart(listItem.get(position).getNumberInCart() + 1);
-        tinyDB.putListObject("CartList", listItem);
+    public void plusNumberItem(ArrayList<RestaurantDetail.Menu> cartList, int position, ChangeNumberItemsListener changeNumberItemsListener) {
+        cartList.get(position).setNumberInCart(cartList.get(position).getNumberInCart() + 1);
+        tinyDB.putListObject("CartList", cartList);
         changeNumberItemsListener.change();
     }
 
-    public void removeItem(ArrayList<Foods> listItem, int position, ChangeNumberItemsListener changeNumberItemsListener) {
-        listItem.remove(position);
-        tinyDB.putListObject("CartList", listItem);
+    public void removeItem(ArrayList<RestaurantDetail.Menu> cartList, int position, ChangeNumberItemsListener changeNumberItemsListener) {
+        cartList.remove(position);
+        tinyDB.putListObject("CartList", cartList);
         changeNumberItemsListener.change();
     }
+
+    public void removeAllItems() {
+        tinyDB.remove("CartList"); // Xóa toàn bộ danh sách giỏ hàng trong TinyDB
+        Toast.makeText(context, "Cart has been cleared", Toast.LENGTH_SHORT).show();
+    }
+
 }
