@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.gms.google-services")
 }
 
 android {
@@ -42,7 +41,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.gson)
-    implementation(libs.firebase.database)
+//    implementation(libs.firebase.database)
     implementation(libs.github.glide)
     implementation(libs.github.glide)
     implementation(libs.play.services.location)

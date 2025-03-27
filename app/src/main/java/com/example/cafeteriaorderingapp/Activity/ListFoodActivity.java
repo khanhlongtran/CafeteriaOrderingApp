@@ -6,79 +6,50 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import com.example.cafeteriaorderingapp.Adapter.FoodListAdapter;
-import com.example.cafeteriaorderingapp.Domain.Foods;
+import com.example.cafeteriaorderingapp.Dto.RestaurantDetail;
 import com.example.cafeteriaorderingapp.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
-public class ListFoodActivity extends BaseActivity {
-    private int categoryId;
-    private String categoryName;
-    private TextView titleTxt;
-    private ImageView backBtn;
-    private RecyclerView foodListView;
-    private ProgressBar progressBar;
+public class ListFoodActivity extends AppCompatActivity {
+    private RecyclerView foodRecyclerView;
+    private FoodListAdapter foodListAdapter;
+    private List<RestaurantDetail.Menu> foodList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_food);
 
-        initViews();
-        getIntentExtra();
-        initList();
-    }
+        foodRecyclerView = findViewById(R.id.foodRecyclerView);
+        foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-    private void initViews() {
-        titleTxt = findViewById(R.id.titleTxt);
-        backBtn = findViewById(R.id.backBtn);
-        foodListView = findViewById(R.id.foodListView);
-        progressBar = findViewById(R.id.progressBar);
-    }
+        // Nhận dữ liệu từ Intent
+        String restaurantName = getIntent().getStringExtra("restaurantName");
+        String menuJson = getIntent().getStringExtra("menuList");
 
-    private void initList() {
-        DatabaseReference myRef = database.getReference("Foods");
-        progressBar.setVisibility(View.VISIBLE);
-        ArrayList<Foods> list = new ArrayList<>();
-        Query query = myRef.orderByChild("CategoryId").equalTo(categoryId);
+        if (menuJson != null) {
+            Type listType = new TypeToken<List<RestaurantDetail.Menu>>() {}.getType();
+            foodList = new Gson().fromJson(menuJson, listType);
+        }
 
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot issue : snapshot.getChildren()) {
-                        list.add(issue.getValue(Foods.class));
-                    }
-                    if (!list.isEmpty()) {
-                        foodListView.setLayoutManager(new LinearLayoutManager(ListFoodActivity.this, LinearLayoutManager.VERTICAL, false));
-                        foodListView.setAdapter(new FoodListAdapter(list));
-                    }
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
+        // Cập nhật RecyclerView
+        foodListAdapter = new FoodListAdapter(this, foodList);
+        foodRecyclerView.setAdapter(foodListAdapter);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
-            }
-        });
-    }
-
-    private void getIntentExtra() {
-        categoryId = getIntent().getIntExtra("CategoryId", 0);
-        categoryName = getIntent().getStringExtra("CategoryName");
-
-        titleTxt.setText(categoryName);
-        backBtn.setOnClickListener(v -> finish());
+        // Hiển thị tên nhà hàng trên thanh tiêu đề
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(restaurantName);
+        }
     }
 }

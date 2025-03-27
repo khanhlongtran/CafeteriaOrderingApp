@@ -2,6 +2,7 @@ package com.example.cafeteriaorderingapp.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,63 +17,65 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.cafeteriaorderingapp.Activity.DetailActivity;
 import com.example.cafeteriaorderingapp.Domain.Foods;
+import com.example.cafeteriaorderingapp.Dto.RestaurantDetail;
 import com.example.cafeteriaorderingapp.R;
 
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-public class FoodListAdapter extends RecyclerView.Adapter<FoodListAdapter.viewholder> {
-    ArrayList<Foods> items;
-    Context context;
+public class FoodListAdapter extends RecyclerView.Adapter<FoodListAdapter.FoodViewHolder> {
+    private List<RestaurantDetail.Menu> foodList;
+    private Context context;
 
-    public FoodListAdapter(ArrayList<Foods> items) {
-        this.items = items;
+    public FoodListAdapter(Context context, List<RestaurantDetail.Menu> foodList) {
+        this.context = context;
+        this.foodList = foodList;
     }
 
     @NonNull
     @Override
-    public viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        return new viewholder(LayoutInflater.from(context).inflate(R.layout.viewholder_list_food, parent, false));
+    public FoodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_food, parent, false);
+        return new FoodViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull viewholder holder, int position) {
-        holder.titleTxt.setText(items.get(position).getTitle());
-        holder.timeTxt.setText(items.get(position).getTimeValue() + " min");
-        holder.priceTxt.setText("$" + items.get(position).getPrice());
-        holder.rateTxt.setText("" + items.get(position).getStar());
-
-        Glide.with(context)
-                .load(items.get(position).getImagePath())
-                .transform(new CenterCrop(), new RoundedCorners(50))
-                .into(holder.pic);
-
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetailActivity.class);
-            intent.putExtra("object", items.get(position));
-            context.startActivity(intent);
+    public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
+        RestaurantDetail.Menu foodItem = foodList.get(position);
+        holder.txtFoodName.setText(foodItem.getItemName());
+        holder.txtFoodPrice.setText(String.format(Locale.getDefault(), "%,.0f VND", foodItem.getPrice()));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("FoodListAdapter", "onBindViewHolder: " + foodItem.toString());
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("foodItem", foodItem); // Truyền object qua Intent
+                context.startActivity(intent);
+            }
         });
+        if (foodItem.getImage() != null && !foodItem.getImage().isEmpty()) {
+            Glide.with(context).load(foodItem.getImage()).into(holder.imgFood);
+        } else {
+            holder.imgFood.setImageResource(R.drawable.white_bg);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return foodList.size();
     }
 
-    public class viewholder extends RecyclerView.ViewHolder {
+    public static class FoodViewHolder extends RecyclerView.ViewHolder {
+        TextView txtFoodName, txtFoodPrice;
+        ImageView imgFood;
 
-        TextView titleTxt, priceTxt, rateTxt, timeTxt;
-        ImageView pic;
-
-        public viewholder(@NonNull View itemView) {
+        public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            titleTxt = itemView.findViewById(R.id.titleTxt);
-            priceTxt = itemView.findViewById(R.id.priceTxt);
-            rateTxt = itemView.findViewById(R.id.ratingTxt);
-            timeTxt = itemView.findViewById(R.id.timeTxt);
-            pic = itemView.findViewById(R.id.img);
+            txtFoodName = itemView.findViewById(R.id.txtFoodName);
+            txtFoodPrice = itemView.findViewById(R.id.txtFoodPrice);
+            imgFood = itemView.findViewById(R.id.imgFood);
         }
     }
 }

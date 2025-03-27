@@ -6,5 +6,9 @@
         <item>COMPLETED</item>
         <item>CANCELED</item>
     </string-array>
+    <string name="DELIVERY_ACCEPTED">Đã chấp nhận giao hàng</string>
+    <string name="DELIVERY_IN_PROGRESS">Đang giao hàng</string>
+    <string name="COMPLETED">Đã hoàn thành</string>
+    <string name="CANCELED">Đã hủy</string>
 
 </resources>

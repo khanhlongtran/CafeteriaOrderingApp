@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.cafeteriaorderingapp.Domain.Foods;
+import com.example.cafeteriaorderingapp.Dto.RestaurantDetail;
 import com.example.cafeteriaorderingapp.Helper.ChangeNumberItemsListener;
 import com.example.cafeteriaorderingapp.Helper.ManagmentCart;
 import com.example.cafeteriaorderingapp.R;
@@ -22,11 +23,11 @@ import com.example.cafeteriaorderingapp.R;
 import java.util.ArrayList;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewholder> {
-    ArrayList<Foods> list;
+    ArrayList<RestaurantDetail.Menu> list;
     private ManagmentCart managmentCart;
     ChangeNumberItemsListener changeNumberItemsListener;
 
-    public CartAdapter(ArrayList<Foods> list, ManagmentCart managmentCart, ChangeNumberItemsListener changeNumberItemsListener) {
+    public CartAdapter(ArrayList<RestaurantDetail.Menu> list, ManagmentCart managmentCart, ChangeNumberItemsListener changeNumberItemsListener) {
         this.list = list;
         this.managmentCart = managmentCart;
         this.changeNumberItemsListener = changeNumberItemsListener;
@@ -40,12 +41,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewholder> {
 
     @Override
     public void onBindViewHolder(@NonNull viewholder holder, int position) {
-        holder.title.setText(list.get(position).getTitle());
+        holder.title.setText(list.get(position).getItemName());
         holder.feeEachItem.setText("$" + (list.get(position).getNumberInCart() * list.get(position).getPrice()));
         holder.num.setText(list.get(position).getNumberInCart() + "");
 
         Glide.with(holder.itemView.getContext())
-                .load(list.get(position).getImagePath())
+                .load(list.get(position).getImage())
                 .transform(new CenterCrop(), new RoundedCorners(30))
                 .into(holder.pic);
 

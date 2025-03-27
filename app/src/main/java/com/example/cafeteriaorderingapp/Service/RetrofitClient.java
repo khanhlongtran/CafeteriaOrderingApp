@@ -10,7 +10,7 @@ public class RetrofitClient {
     public static ApiService getRecommendService() {
         if (retrofitRecommend == null) {
             retrofitRecommend = new Retrofit.Builder()
-                    .baseUrl("http://192.168.0.102:5120/") // API recommend
+                    .baseUrl("http://192.168.1.252:5120/") // API recommend
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
@@ -20,7 +20,7 @@ public class RetrofitClient {
     public static ApiService getDetailService() {
         if (retrofitMealDetail == null) {
             retrofitMealDetail = new Retrofit.Builder()
-                    .baseUrl("http://192.168.0.102:5110/") // API meal detail
+                    .baseUrl("http://192.168.1.252:5110/") // API meal detail
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
