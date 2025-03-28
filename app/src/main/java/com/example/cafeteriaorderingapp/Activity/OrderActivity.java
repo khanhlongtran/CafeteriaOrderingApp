@@ -83,7 +83,7 @@ public class OrderActivity extends BaseActivity {
                     }
                 } else {
                     Log.e("OrderActivity", "Response Error: " + response.errorBody());
-                    Toast.makeText(OrderActivity.this, "Lỗi lấy đơn hàng", Toast.LENGTH_SHORT).show();
+
                 }
             }
 
@@ -122,7 +122,7 @@ public class OrderActivity extends BaseActivity {
                     }
                 } else {
                     Log.e("OrderActivity", "Response Error: " + response.errorBody());
-                    Toast.makeText(OrderActivity.this, "Lỗi lấy đơn hàng", Toast.LENGTH_SHORT).show();
+
                 }
             }
 

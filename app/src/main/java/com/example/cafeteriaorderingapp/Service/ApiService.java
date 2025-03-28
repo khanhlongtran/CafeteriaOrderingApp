@@ -15,6 +15,7 @@ import com.example.cafeteriaorderingapp.Vnpay.PaymentVNPAYResponse;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -62,5 +63,8 @@ public interface ApiService {
 
     @GET("api/Patron/restaurant/menu")
     Call<List<RestaurantDetail>> searchMenu(@Query("menuName") String menuName);
+
+    @PUT("api/Patron/MyAccount/ChangeDefaultCuisine/{userId}")
+    Call<ResponseBody> changeDefaultCuisine(@Path("userId") int userId, @Body String defaultCuisine);
 }
 

@@ -89,7 +89,6 @@ public class DelivererInProgressAdapter extends RecyclerView.Adapter<DelivererIn
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(context, "Cập nhật trạng thái thành công", Toast.LENGTH_SHORT).show();
                     Log.d("OrderUpdate", "Order " + orderId + " updated to " + newStatus);
                 } else {
                     Toast.makeText(context, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();

@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 
 import com.example.cafeteriaorderingapp.R;
+import com.example.cafeteriaorderingapp.Service.ApiService;
+import com.example.cafeteriaorderingapp.Service.RetrofitClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationCallback;
@@ -37,9 +40,18 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class SettingAccountActivity extends BaseActivity {
+    ApiService detailService = RetrofitClient.getDetailService();
     private AppCompatButton LocationButton, updateButton, logoutButton;
+    private EditText cuisineEdit;
+    private int userId;
+
     private LocationRequest locationRequest;
 
     @Override
@@ -49,6 +61,18 @@ public class SettingAccountActivity extends BaseActivity {
 
         LocationButton = findViewById(R.id.LocationButton);
         updateButton = findViewById(R.id.updateButton);
+        cuisineEdit = findViewById(R.id.cuisineEdit);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+        String userIdStr  = sharedPreferences.getString("ACCOUNT_ID", null);
+        userId = Integer.parseInt(userIdStr);
+        updateButton.setOnClickListener(v -> {
+            String newCuisine = cuisineEdit.getText().toString().trim();
+            if (!newCuisine.isEmpty()) {
+                changeDefaultCuisine(userId, newCuisine);
+            } else {
+                Toast.makeText(this, "Vui lòng nhập món ăn mặc định!", Toast.LENGTH_SHORT).show();
+            }
+        });
         logoutButton = findViewById(R.id.logoutButton);
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -194,5 +218,26 @@ public class SettingAccountActivity extends BaseActivity {
         isEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         return isEnabled;
 
+    }
+
+    private void changeDefaultCuisine(int userId, String defaultCuisine) {
+        detailService.changeDefaultCuisine(userId, defaultCuisine).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Log.d("UpdateCuisine", "Món ăn mặc định đã được cập nhật.");
+                    Toast.makeText(SettingAccountActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("UpdateCuisine", "Lỗi cập nhật: " + response.code());
+                    Toast.makeText(SettingAccountActivity.this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("UpdateCuisine", "Gọi API thất bại", t);
+                Toast.makeText(SettingAccountActivity.this, "Lỗi kết nối!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
