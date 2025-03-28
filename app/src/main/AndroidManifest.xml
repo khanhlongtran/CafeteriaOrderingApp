@@ -13,12 +13,15 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CafeteriaOrderingApp"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".Activity.Deliverer.SettingDelivererActivity"
+            android:exported="false" />
         <activity
             android:name=".Activity.Deliverer.HomeDelivererActivity"
             android:exported="false" />
@@ -49,8 +52,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="myapp" android:host="payment-success" />
-                <data android:scheme="myapp" android:host="payment-failed" />
+                <data
+                    android:host="payment-success"
+                    android:scheme="myapp" />
+                <data
+                    android:host="payment-failed"
+                    android:scheme="myapp" />
             </intent-filter>
         </activity>
         <activity
@@ -67,9 +74,7 @@
             android:exported="false" />
         <activity
             android:name=".Activity.IntroActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>

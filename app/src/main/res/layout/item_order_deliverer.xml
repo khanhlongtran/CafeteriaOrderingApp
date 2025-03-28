@@ -1,101 +1,106 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:background="@color/yellow"
     android:orientation="vertical"
->
+    android:padding="16dp">
 
-    <!-- Row 1: Recipient Name -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="4dp">
+        android:paddingBottom="8dp">
+
         <TextView
             android:id="@+id/recipientName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Recipient Name"
-            android:layout_weight="1"/>
+            android:textColor="#333333" />
 
         <TextView
             android:id="@+id/recipientNameValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="John Doe"
-            android:layout_gravity="end"/>
+            android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- Row 2: Recipient Phone -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="4dp">
+        android:paddingBottom="8dp">
+
         <TextView
             android:id="@+id/recipientPhone"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Phone Number"
-            android:layout_weight="1"/>
+            android:textColor="#333333" />
 
         <TextView
             android:id="@+id/recipientPhoneValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="123-456-7890"
-            android:layout_gravity="end"/>
+            android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- Row 3: Address -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:paddingBottom="16dp">
+
         <TextView
             android:id="@+id/orderAddress"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Address"
-            android:layout_weight="1"/>
+            android:textColor="#333333" />
 
         <TextView
             android:id="@+id/orderAddressValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="123 Main St, City, Country"
-            android:layout_gravity="end"/>
+            android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- Row 4: Total Amount -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:paddingBottom="16dp">
+
         <TextView
             android:id="@+id/orderTotalAmount"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Total:"
-            android:textStyle="bold"
-            android:layout_weight="1"/>
+            android:textColor="#333333"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/orderTotalAmountValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="150,000 VND" />
+            android:text="150,000 VND"
+            android:textColor="#333333" />
     </LinearLayout>
 
-    <!-- Button to accept order -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/acceptOrderButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/red_bg_full_corner"
         android:text="Accept Order"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp"/>
+        android:textColor="#FFFFFF" />
 </LinearLayout>
