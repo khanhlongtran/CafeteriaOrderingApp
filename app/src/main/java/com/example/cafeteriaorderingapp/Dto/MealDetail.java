@@ -2,7 +2,9 @@ package com.example.cafeteriaorderingapp.Dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MealDetail {
+import java.io.Serializable;
+
+public class MealDetail implements Serializable {
     @SerializedName("itemId")
     private int itemId;
 

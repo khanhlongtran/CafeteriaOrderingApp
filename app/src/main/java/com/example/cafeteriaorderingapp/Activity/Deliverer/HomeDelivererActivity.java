@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -72,6 +73,16 @@ public class HomeDelivererActivity extends AppCompatActivity {
         delivererInProgressAdapter = new DelivererInProgressAdapter(this, orderInProgress);
         recyclerAcceptedOrder.setAdapter(delivererInProgressAdapter);
 
+        orderAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                updateRecyclerViewHeight(recyclerRequestDelivery, orderList.size());
+            }
+        });
+
+        // Cập nhật chiều cao ban đầu
+        updateRecyclerViewHeight(recyclerRequestDelivery, orderList.size());
     }
 
     private void fetchOrders() {
@@ -147,6 +158,17 @@ public class HomeDelivererActivity extends AppCompatActivity {
                 Log.e("InProgressError", "Failed to fetch in-progress orders: " + t.getMessage());
             }
         });
+    }
+
+    private void updateRecyclerViewHeight(RecyclerView recyclerView, int itemCount) {
+        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+        params.height = (itemCount > 0) ? dpToPx(300) : 0; // Nếu có dữ liệu: 300dp, nếu không: 0
+        recyclerView.setLayoutParams(params);
+    }
+
+    // Chuyển đổi dp sang pixel
+    private int dpToPx(int dp) {
+        return (int) (dp * getResources().getDisplayMetrics().density);
     }
 
 }

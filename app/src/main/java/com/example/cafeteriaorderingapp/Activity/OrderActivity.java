@@ -1,5 +1,7 @@
 package com.example.cafeteriaorderingapp.Activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,6 +35,7 @@ public class OrderActivity extends BaseActivity {
     private OrderAdapter orderAdapter;
     private List<Order> orderCompleList = new ArrayList<>();
     private List<Order> orderCurrentList = new ArrayList<>();
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,9 @@ public class OrderActivity extends BaseActivity {
         currentOrderRecyclerView= findViewById(R.id.orderCurrentRecyclerView);
         currentOrderRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        int userId = 12; // Giả định userId, bạn có thể lấy từ SharedPreferences hoặc Intent
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+        String userIdStr  = sharedPreferences.getString("ACCOUNT_ID", null);
+        userId = Integer.parseInt(userIdStr);
         fetchOrderHistory(userId);
         fetchCurrentOrders(userId);
     }
