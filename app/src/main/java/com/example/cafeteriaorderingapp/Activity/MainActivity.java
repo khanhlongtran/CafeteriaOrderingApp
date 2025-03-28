@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +44,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
+    private SearchView searchView;
     private RecyclerView restaurantsView, mealsView;
     private BottomNavigationView bottomMenu;
     private static final String TAG = "API_RESPONSE";
@@ -220,6 +222,7 @@ public class MainActivity extends BaseActivity {
         restaurantsView = findViewById(R.id.listRestaurantView);
         mealsView = findViewById(R.id.listMealsView);
         bottomMenu = findViewById(R.id.bottomMenu);
+        searchView = findViewById(R.id.searchView);
     }
 
 
@@ -241,7 +244,87 @@ public class MainActivity extends BaseActivity {
             }
             return false;
         });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.trim().isEmpty()) {
+                    menuList.clear();
+                    initRestaurants();
+                } else {
+                    fetchSearchMenu(query);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                if (query.trim().isEmpty()) {
+                    menuList.clear();
+                    initRestaurants();
+                } else {
+                    fetchSearchMenu(query);
+                }
+                return false;
+            }
+        });
     }
+
+    private void fetchSearchMenu(String query) {
+        String url = detailService.searchMenu(query).request().url().toString();
+        Log.d(TAG, "fetchSearchMenu: " + url);
+
+        detailService.searchMenu(query).enqueue(new Callback<List<RestaurantDetail>>() {
+            @Override
+            public void onResponse(Call<List<RestaurantDetail>> call, Response<List<RestaurantDetail>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<RestaurantDetail> searchResults = response.body();
+                    menuList.clear(); // Xóa danh sách cũ trước khi cập nhật dữ liệu mới
+
+                    Log.d(TAG, "Raw JSON Response: " + new Gson().toJson(searchResults));
+
+                    for (RestaurantDetail restaurantDetail : searchResults) {
+                        Log.d(TAG, "Restaurant Name: " + restaurantDetail.getMenuName());
+                        Log.d(TAG, "Menu Id: " + restaurantDetail.getMenuId());
+
+                        // Lấy danh sách địa chỉ
+                        String restaurantImage = null;
+                        if (restaurantDetail.getAddresses() != null && !restaurantDetail.getAddresses().isEmpty()) {
+                            restaurantImage = restaurantDetail.getAddresses().get(0).getImage();
+                        } else {
+                            Log.e(TAG, "Addresses is NULL hoặc trống!");
+                        }
+
+                        // Tạo một đối tượng đại diện cho nhà hàng
+                        RestaurantDetail.Menu restaurantMenu = new RestaurantDetail.Menu();
+                        restaurantMenu.setItemName(restaurantDetail.getMenuName());
+                        restaurantMenu.setImage(restaurantImage);
+                        restaurantMenu.setMenuList(new ArrayList<>(restaurantDetail.getMenus()));
+
+                        menuList.add(restaurantMenu);
+                    }
+
+                    runOnUiThread(() -> {
+                        if (menuAdapter == null) {
+                            menuAdapter = new MenuAdapter(MainActivity.this, menuList);
+                            restaurantsView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                            restaurantsView.setAdapter(menuAdapter);
+                        } else {
+                            menuAdapter.notifyDataSetChanged();
+                        }
+                    });
+
+                } else {
+                    Log.e(TAG, "Lỗi tìm kiếm: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<RestaurantDetail>> call, Throwable t) {
+                Log.e(TAG, "Gọi API thất bại", t);
+            }
+        });
+    }
+
 
     }
 

@@ -59,5 +59,8 @@ public interface ApiService {
 
     @POST("api/v1/delivery/CreateDelivery")
     Call<Delivery.DeliveryResponse> createDelivery(@Body Delivery.DeliveryCreateDto deliveryCreateDto);
+
+    @GET("api/Patron/restaurant/menu")
+    Call<List<RestaurantDetail>> searchMenu(@Query("menuName") String menuName);
 }
 
